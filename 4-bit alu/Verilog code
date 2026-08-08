@@ -1,0 +1,80 @@
+`timescale 1ns/1ps
+
+module alu4bit (
+    input  wire [3:0] A,
+    input  wire [3:0] B,
+    input  wire [2:0] ALU_SEL,
+    output reg  [3:0] Y,
+    output reg        CARRY
+);
+
+    reg [4:0] temp;
+
+    always @(*) begin
+
+        // Default values
+        Y = 4'b0000;
+        CARRY = 1'b0;
+        temp = 5'b00000;
+
+        case (ALU_SEL)
+
+            // Addition
+            3'b000: begin
+                temp = {1'b0, A} + {1'b0, B};
+                Y = temp[3:0];
+                CARRY = temp[4];
+            end
+
+            // Subtraction
+            3'b001: begin
+                Y = A - B;
+                CARRY = (A < B);
+            end
+
+            // AND
+            3'b010: begin
+                Y = A & B;
+                CARRY = 1'b0;
+            end
+
+            // OR
+            3'b011: begin
+                Y = A | B;
+                CARRY = 1'b0;
+            end
+
+            // XOR
+            3'b100: begin
+                Y = A ^ B;
+                CARRY = 1'b0;
+            end
+
+            // NOT A
+            3'b101: begin
+                Y = ~A;
+                CARRY = 1'b0;
+            end
+
+            // Increment A
+            3'b110: begin
+                temp = {1'b0, A} + 5'b00001;
+                Y = temp[3:0];
+                CARRY = temp[4];
+            end
+
+            // Decrement A
+            3'b111: begin
+                Y = A - 4'b0001;
+                CARRY = (A == 4'b0000);
+            end
+
+            default: begin
+                Y = 4'b0000;
+                CARRY = 1'b0;
+            end
+
+        endcase
+    end
+
+endmodule
